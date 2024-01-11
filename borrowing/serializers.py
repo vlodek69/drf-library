@@ -9,11 +9,9 @@ class BorrowingSerializer(serializers.ModelSerializer):
         model = Borrowing
         fields = (
             "id",
-            "user",
             "book",
             "borrowing_date",
             "expected_return_date",
-            "actual_return_date",
         )
 
     def validate(self, data):
