@@ -15,13 +15,16 @@ class BorrowingSerializer(serializers.ModelSerializer):
         )
 
     def validate(self, data):
-        if data["expected_return_date"] <= data["borrowing_date"]:
+        borrowing_date = data.get("borrowing_date", datetime.date.today())
+
+        if data.get("expected_return_date") <= borrowing_date:
             raise serializers.ValidationError(
-                "expected_return_date should be at least a day after borrowing_date."
+                "expected_return_date should be at least a day after "
+                "borrowing_date."
             )
         if (
-            data["actual_return_date"]
-            and data["actual_return_date"] < data["borrowing_date"]
+            data.get("actual_return_date")
+            and data.get("actual_return_date") < borrowing_date
         ):
             raise serializers.ValidationError(
                 "actual_return_date cannot be before borrowing_date."
