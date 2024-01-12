@@ -29,3 +29,17 @@ class Borrowing(models.Model):
                 name="actual_return_date_cannot_be_before_borrowing",
             ),
         ]
+
+    def __str__(self):
+        return str(self.borrowing_date) + " " + self.book.title
+
+    def telegram_message(self) -> str:
+        return (
+            f"Borrowing ID: {self.id}"
+            f"\nBorrowing date: {self.borrowing_date}"
+            f"\nExpected return date: {self.expected_return_date}"
+            f"\nBook: {self.book.__str__()}"
+            f"\nLeft in inventory: {self.book.inventory}"
+            f"\nUser email: {self.user.__str__()}"
+            f"\nUser ID: {self.user.id}"
+        )
