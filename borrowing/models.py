@@ -35,8 +35,11 @@ class Borrowing(models.Model):
 
     def telegram_message(self) -> str:
         return (
-            f"Borrowing date: {self.borrowing_date}"
+            f"Borrowing ID: {self.id}"
+            f"\nBorrowing date: {self.borrowing_date}"
             f"\nExpected return date: {self.expected_return_date}"
             f"\nBook: {self.book.__str__()}"
-            f"\nUser: {self.user.__str__()}"
+            f"\nLeft in inventory: {self.book.inventory}"
+            f"\nUser email: {self.user.__str__()}"
+            f"\nUser ID: {self.user.id}"
         )
