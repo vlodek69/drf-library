@@ -1,5 +1,6 @@
 from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -12,6 +13,11 @@ from borrowing.serializers import (
 )
 
 
+class BorrowingPagination(PageNumberPagination):
+    page_size = 10
+    max_page_size = 100
+
+
 class BorrowingViewSet(
     mixins.CreateModelMixin,
     mixins.UpdateModelMixin,
@@ -21,6 +27,7 @@ class BorrowingViewSet(
 ):
     queryset = Borrowing.objects.select_related("user", "book")
     permission_classes = (IsAuthenticated,)
+    pagination_class = BorrowingPagination
 
     def get_queryset(self):
         is_active = self.request.query_params.get("is_active")
