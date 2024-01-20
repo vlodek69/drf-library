@@ -20,7 +20,6 @@ class BorrowingPagination(PageNumberPagination):
 
 class BorrowingViewSet(
     mixins.CreateModelMixin,
-    mixins.UpdateModelMixin,
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
     viewsets.GenericViewSet,
