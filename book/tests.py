@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -6,7 +8,15 @@ from rest_framework.test import APIClient
 from book.models import Book
 from book.serializers import BookSerializer
 
+
 BOOK_URL = reverse("book-list")
+BOOK_PAYLOAD = {
+    "cover": "SC",
+    "title": "Test book",
+    "author": "Test Author",
+    "inventory": 4,
+    "daily_fee": Decimal("4.20"),
+}
 
 
 def sample_book(**params):
@@ -53,14 +63,7 @@ class UnauthenticatedBookTests(TestCase):
         self.assertEqual(res.data, serializer.data)
 
     def test_create_forbiden(self):
-        payload = {
-            "cover": "SC",
-            "title": "Test book",
-            "author": "Test Author",
-            "inventory": 4,
-            "daily_fee": 4.20,
-        }
-        res = self.client.post(BOOK_URL, payload)
+        res = self.client.post(BOOK_URL, BOOK_PAYLOAD)
 
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
@@ -75,13 +78,23 @@ class AuthenticatedBookTests(UnauthenticatedBookTests):
         self.client.force_authenticate(self.user)
 
     def test_create_forbiden(self):
-        payload = {
-            "cover": "SC",
-            "title": "Test book",
-            "author": "Test Author",
-            "inventory": 4,
-            "daily_fee": 4.20,
-        }
-        res = self.client.post(BOOK_URL, payload)
+        res = self.client.post(BOOK_URL, BOOK_PAYLOAD)
 
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class AdminBookTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = get_user_model().objects.create_user(
+            "admin@admin.com", "testpass", is_staff=True
+        )
+        self.client.force_authenticate(self.user)
+
+    def test_create_book(self):
+        res = self.client.post(BOOK_URL, BOOK_PAYLOAD)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        book = Book.objects.get(id=res.data["id"])
+        for key in BOOK_PAYLOAD.keys():
+            self.assertEqual(BOOK_PAYLOAD[key], getattr(book, key))
