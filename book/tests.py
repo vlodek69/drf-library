@@ -98,3 +98,32 @@ class AdminBookTests(TestCase):
         book = Book.objects.get(id=res.data["id"])
         for key in BOOK_PAYLOAD.keys():
             self.assertEqual(BOOK_PAYLOAD[key], getattr(book, key))
+
+    def test_update_book(self):
+        book = sample_book()
+        payload = {
+            "cover": "SC",
+            "title": "Updated book",
+            "author": "Updated Author",
+            "inventory": 10,
+            "daily_fee": Decimal("7.89"),
+        }
+
+        url = detail_url(book.id)
+        res = self.client.put(url, payload)
+
+        book = Book.objects.get(id=book.id)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        for key in payload.keys():
+            self.assertEqual(payload[key], getattr(book, key))
+
+    def test_delete_book(self):
+        book = sample_book()
+        url = detail_url(book.id)
+        res = self.client.delete(url)
+
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+
+        book = Book.objects.first()
+        self.assertEqual(None, book)
