@@ -1,3 +1,5 @@
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
@@ -64,6 +66,9 @@ class BorrowingViewSet(
         permission_classes=[IsAuthenticated],
     )
     def return_book(self, request, pk=None):
+        """Endpoint for returning the borrowing. Upon post sets
+        actual_return_date to today's date and adds 1 to returned book
+        inventory"""
         borrowing = self.get_object()
         serializer = self.get_serializer(borrowing, data=request.data)
 
@@ -72,3 +77,24 @@ class BorrowingViewSet(
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "user_id",
+                type=OpenApiTypes.INT,
+                description="Filter by user id (ex. ?user_id=2)",
+            ),
+            OpenApiParameter(
+                "is_active",
+                type=OpenApiTypes.ANY,
+                description=(
+                    "Show only active borrowings, ones that have no "
+                    "actual_return_date, if parameter in not None "
+                    "(ex. ?is_active=1 or ?is=active=true or ?is_active=any)"
+                ),
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
