@@ -66,6 +66,9 @@ class BorrowingViewSet(
         permission_classes=[IsAuthenticated],
     )
     def return_book(self, request, pk=None):
+        """Endpoint for returning the borrowing. Upon post sets
+        actual_return_date to today's date and adds 1 to returned book
+        inventory"""
         borrowing = self.get_object()
         serializer = self.get_serializer(borrowing, data=request.data)
 
