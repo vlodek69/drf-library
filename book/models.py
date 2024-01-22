@@ -15,4 +15,4 @@ class Book(models.Model):
         ordering = ["title"]
 
     def __str__(self):
-        return self.title + " ($" + str(self.daily_fee) + ")"
+        return f"{self.title} (${self.daily_fee})"
