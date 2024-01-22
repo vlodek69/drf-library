@@ -32,7 +32,7 @@ class Borrowing(models.Model):
         ]
 
     def __str__(self):
-        return str(self.borrowing_date) + " " + self.book.title
+        return f"{self.borrowing_date} - {self.book.title}"
 
     def telegram_message(self) -> str:
         return (
